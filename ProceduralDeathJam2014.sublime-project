@@ -1,0 +1,25 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"name": "ProceduralDeathJam2014",
+			"path": "/Volumes/Macintosh HD/Users/patrickmckenna/Code/agaw/ProceduralDeathJam2014"
+		},
+		{
+			"follow_symlinks": true,
+			"name": "Flixel",
+			"path": "/Applications/Stencyl/plaf/haxe/lib/flixel/git/"
+		},
+		{
+			"follow_symlinks": true,
+			"name": "Flixel Addons",
+			"path": "/Applications/Stencyl/plaf/haxe/lib/flixel-addons/git/"
+		},
+		{
+			"follow_symlinks": true,
+			"name": "Haxe",
+			"path": "/usr/lib/haxe/std"
+		}
+	]
+}
