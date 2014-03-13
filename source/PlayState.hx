@@ -4,8 +4,10 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.text.FlxText;
+import flixel.tile.FlxTilemap;
 import flixel.ui.FlxButton;
 import flixel.util.FlxMath;
+import openfl.Assets;
 
 /**
  * A FlxState which can be used for the actual gameplay.
@@ -13,11 +15,29 @@ import flixel.util.FlxMath;
 class PlayState extends FlxState
 {
 	/**
+	 * Some static constants for the size of the tilemap tiles
+	 */
+	private static inline var TILE_WIDTH:Int = 16;
+	private static inline var TILE_HEIGHT:Int = 16;
+	
+	/**
+	 * The FlxTilemap we're using
+	 */
+	private var _collisionMap:FlxTilemap;
+	
+	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
 	override public function create():Void
 	{
-		super.create();
+		FlxG.mouse.visible = false;
+		
+		// Creates a new tilemap with no arguments
+		_collisionMap = new FlxTilemap();
+
+		// Initializes the map using the generated string, the tile images, and the tile size
+		_collisionMap.loadMap(Assets.getText("assets/data/test_tilemap.txt"), "assets/images/wall1_tiles.png", TILE_WIDTH, TILE_HEIGHT, FlxTilemap.AUTO);
+		add(_collisionMap);
 	}
 	
 	/**
