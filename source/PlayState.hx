@@ -65,6 +65,8 @@ class PlayState extends FlxState
 		add(_collisionMap);
 
 		add(_player);
+
+		FlxG.camera.follow(_player);
 	}
 	
 	/**
