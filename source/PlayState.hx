@@ -28,6 +28,8 @@ class PlayState extends FlxState
 
 
 	private var _player:Player;
+
+	private var _dungeonBuilder:DungeonBuilder;
 	
 	/**
 	 * Function that is called up when to state is created to set it up. 
@@ -36,11 +38,29 @@ class PlayState extends FlxState
 	{
 		FlxG.mouse.visible = false;
 		
+		_dungeonBuilder = new DungeonBuilder();
+		_dungeonBuilder.generate(63,63,64,20,64);
+
+		var map = "";
+		for (y in 0 ... _dungeonBuilder.mapHeight) {
+			for (x in 0 ... _dungeonBuilder.mapWidth) {
+				if (_dungeonBuilder.mapArr[y][x] == 2) {	// wall
+					map += "1,";
+				} else {
+					map += "0,";
+				}
+			}
+			map += "0\n";
+		}
+
+		trace(map);
+
+
 		// Creates a new tilemap with no arguments
 		_collisionMap = new FlxTilemap();
 
 		// Initializes the map using the generated string, the tile images, and the tile size
-		_collisionMap.loadMap(Assets.getText("assets/data/test_tilemap.txt"), "assets/images/wall1_tiles.png", TILE_WIDTH, TILE_HEIGHT, FlxTilemap.AUTO);
+		_collisionMap.loadMap(map, "assets/images/wall1_tiles.png", TILE_WIDTH, TILE_HEIGHT, FlxTilemap.AUTO);
 		add(_collisionMap);
 
 		_player = new Player(64, 220);		
