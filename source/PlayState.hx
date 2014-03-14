@@ -30,6 +30,8 @@ class PlayState extends FlxState
 	private var _player:Player;
 
 	private var _dungeonBuilder:DungeonBuilder;
+
+	private var _distMap:FlxTilemap;
 	
 	/**
 	 * Function that is called up when to state is created to set it up. 
@@ -40,6 +42,10 @@ class PlayState extends FlxState
 		
 		_dungeonBuilder = new DungeonBuilder();
 		_dungeonBuilder.generate(63,63,64,20,64);
+
+		_distMap = new FlxTilemap();
+		_distMap.scale.set(16,16);
+		var arr:Array<Int> = new Array<Int>();
 
 		var map = "";
 		for (y in 0 ... _dungeonBuilder.mapHeight) {
@@ -53,9 +59,15 @@ class PlayState extends FlxState
 						_player = new Player(x * 16, y * 16);
 					}
 				}
+
+				arr.push(0);
 			}
 			map += "0\n";
 		}
+
+		_distMap.widthInTiles = _dungeonBuilder.mapWidth;
+		_distMap.heightInTiles = _dungeonBuilder.mapHeight;
+		_distMap.loadMap(arr, "assets/images/heat.png",1,1);
 
 		// Creates a new tilemap with no arguments
 		_collisionMap = new FlxTilemap();
@@ -65,6 +77,45 @@ class PlayState extends FlxState
 		add(_collisionMap);
 
 		add(_player);
+
+		updateDistance(_player, _distMap, _collisionMap);
+	}
+
+	private function updateDistance(mcguffin:FlxSprite, distmap:FlxTilemap, tilemap:FlxTilemap):Void 
+	{
+		var startX:Int = Std.int((mcguffin.y * tilemap.widthInTiles) + mcguffin.x);
+		var endX:Int = 0;
+		if (startX == endX)
+			endX = 1;
+
+		trace(startX + ", " + endX);
+			
+		var distances:Array<Int>;
+		var tempDistances = tilemap.computePathDistance(startX, endX, true, false);
+		
+		if (tempDistances == null)
+			return;
+		else
+			distances = tempDistances; // safe to assign
+		
+		var maxDistance:Int = 1;
+		for (dist in distances) 
+		{
+			if (dist > maxDistance)
+				maxDistance = dist;
+		}
+		
+		for (i in 0...distances.length) 
+		{
+			trace(distances[i]);
+			var disti:Int = 0;
+			if (distances[i] < 0) 
+				disti = 1000;
+			else
+				disti = Std.int(999 * (distances[i] / maxDistance));
+				
+			distmap.setTileByIndex(i, disti, true);
+		}
 	}
 	
 	/**
