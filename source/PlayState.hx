@@ -48,13 +48,14 @@ class PlayState extends FlxState
 					map += "1,";
 				} else {
 					map += "0,";
+					if (_player == null && _dungeonBuilder.mapArr[y][x] == 0) {
+						// spawn the player on a walkable tile (0)
+						_player = new Player(x * 16, y * 16);
+					}
 				}
 			}
 			map += "0\n";
 		}
-
-		trace(map);
-
 
 		// Creates a new tilemap with no arguments
 		_collisionMap = new FlxTilemap();
@@ -63,7 +64,6 @@ class PlayState extends FlxState
 		_collisionMap.loadMap(map, "assets/images/wall1_tiles.png", TILE_WIDTH, TILE_HEIGHT, FlxTilemap.AUTO);
 		add(_collisionMap);
 
-		_player = new Player(64, 220);		
 		add(_player);
 	}
 	
