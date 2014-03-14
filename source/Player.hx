@@ -43,7 +43,9 @@ class Player extends FlxSprite
 		super(X, Y);
 
 		// Make the player graphic.
-		makeGraphic(TILE_SIZE, TILE_SIZE, 0xffc04040);
+		loadGraphic("assets/images/player.png", true, true, 16);
+		animation.add("idle", [0, 1], 1);
+		animation.add("walk", [0, 1], 8);
 	}
 
 	override public function update():Void
@@ -66,6 +68,10 @@ class Player extends FlxSprite
 				case RIGHT:
 					x += MOVEMENT_SPEED;
 			}
+
+			animation.play("walk");
+		} else {
+			animation.play("idle");
 		}
 
 		// Check if the player has now reached the next block
