@@ -149,8 +149,21 @@ class PlayState extends FlxState
 			_player.moveToNextTile = false;
 		}
 
-		var i:Int = Std.int((_player.y/16 * _fogMap.widthInTiles) + _player.x/16);
-		_fogMap.setTileByIndex(i, 4, true);
+		updateFog(Std.int(_player.x/16), Std.int(_player.y/16), 4);
+	}
+
+	public function updateFog(x:Int, y:Int, radius:Int):Void
+	{
+		for (j in y - radius ... y + radius) {
+			if (j < 0 || j > _fogMap.widthInTiles) continue;
+			
+			for (i in x - radius ... x + radius) {
+				if (x < 0 || x > _fogMap.heightInTiles) continue;
+
+				var idx:Int = (j * _fogMap.widthInTiles) + x;
+				_fogMap.setTileByIndex(idx, Std.int(Math.abs(x-i) + Math.abs(y-j)), true);
+			}
+		}
 	}
 
 	/**
