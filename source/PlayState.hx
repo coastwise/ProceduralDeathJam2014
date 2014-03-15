@@ -7,6 +7,7 @@ import flixel.FlxState;
 import flixel.text.FlxText;
 import flixel.tile.FlxTilemap;
 import flixel.ui.FlxButton;
+import flixel.util.FlxColor;
 import flixel.util.FlxMath;
 import openfl.Assets;
 
@@ -32,6 +33,7 @@ class PlayState extends FlxState
 	private var _dungeonBuilder:DungeonBuilder;
 
 	private var _distMap:FlxTilemap;
+	private var _fogMap:FlxTilemap;
 	
 	/**
 	 * Function that is called up when to state is created to set it up. 
@@ -39,6 +41,7 @@ class PlayState extends FlxState
 	override public function create():Void
 	{
 		FlxG.mouse.visible = false;
+		FlxG.camera.bgColor = FlxColor.WHITE;
 		
 		_dungeonBuilder = new DungeonBuilder();
 		_dungeonBuilder.generate(63,63,64,20,64);
@@ -46,6 +49,8 @@ class PlayState extends FlxState
 		_distMap = new FlxTilemap();
 		_distMap.scale.set(16,16);
 		var arr:Array<Int> = new Array<Int>();
+
+		_fogMap = new FlxTilemap();
 
 		var map = "";
 		for (y in 0 ... _dungeonBuilder.mapHeight) {
@@ -77,10 +82,17 @@ class PlayState extends FlxState
 		_distMap.heightInTiles = _collisionMap.heightInTiles;
 		_distMap.loadMap(arr, "assets/images/heat.png",1,1);
 
+		_fogMap.widthInTiles = _collisionMap.widthInTiles;
+		_fogMap.heightInTiles = _collisionMap.heightInTiles;
+		_fogMap.loadMap(arr, "assets/images/dither.png",16,16);
+		
+		
 		FlxG.worldBounds.set(0, 0, _collisionMap.width, _collisionMap.height);
 		//FlxG.worldBounds = _collisionMap.getBounds();
 
 		add(_player);
+
+		add(_fogMap);
 
 		FlxG.camera.follow(_player);
 
@@ -136,6 +148,9 @@ class PlayState extends FlxState
 			// is crucial, otherwise you can get stuck in the wall
 			_player.moveToNextTile = false;
 		}
+
+		var i:Int = Std.int((_player.y/16 * _fogMap.widthInTiles) + _player.x/16);
+		_fogMap.setTileByIndex(i, 4, true);
 	}
 
 	/**
