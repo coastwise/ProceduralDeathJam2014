@@ -63,11 +63,8 @@ class PlayState extends FlxState
 				arr.push(0);
 			}
 			map += "0\n";
+			arr.push(0);
 		}
-
-		_distMap.widthInTiles = _dungeonBuilder.mapWidth;
-		_distMap.heightInTiles = _dungeonBuilder.mapHeight;
-		_distMap.loadMap(arr, "assets/images/heat.png",1,1);
 
 		// Creates a new tilemap with no arguments
 		_collisionMap = new FlxTilemap();
@@ -75,6 +72,10 @@ class PlayState extends FlxState
 		// Initializes the map using the generated string, the tile images, and the tile size
 		_collisionMap.loadMap(map, "assets/images/wall1_tiles.png", TILE_WIDTH, TILE_HEIGHT, FlxTilemap.AUTO);
 		add(_collisionMap);
+
+		_distMap.widthInTiles = _collisionMap.widthInTiles;
+		_distMap.heightInTiles = _collisionMap.heightInTiles;
+		_distMap.loadMap(arr, "assets/images/heat.png",1,1);
 
 		FlxG.worldBounds.set(0, 0, _collisionMap.width, _collisionMap.height);
 		//FlxG.worldBounds = _collisionMap.getBounds();
@@ -88,7 +89,7 @@ class PlayState extends FlxState
 
 	private function updateDistance(mcguffin:FlxSprite, distmap:FlxTilemap, tilemap:FlxTilemap):Void 
 	{
-		var startX:Int = Std.int((mcguffin.y * tilemap.widthInTiles) + mcguffin.x);
+		var startX:Int = Std.int((mcguffin.y/16 * tilemap.widthInTiles) + mcguffin.x/16);
 		var endX:Int = 0;
 		if (startX == endX)
 			endX = 1;
