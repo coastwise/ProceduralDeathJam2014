@@ -2,6 +2,7 @@ package;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.FlxObject;
 
 /**
  * ...
@@ -64,8 +65,10 @@ class Player extends FlxSprite
 				case DOWN:
 					y += MOVEMENT_SPEED;
 				case LEFT:
+					facing = FlxObject.LEFT;
 					x -= MOVEMENT_SPEED;
 				case RIGHT:
+					facing = FlxObject.RIGHT;
 					x += MOVEMENT_SPEED;
 			}
 
