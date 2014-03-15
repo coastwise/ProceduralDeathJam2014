@@ -93,9 +93,7 @@ class PlayState extends FlxState
 		var endX:Int = 0;
 		if (startX == endX)
 			endX = 1;
-
-		trace(startX + ", " + endX);
-			
+	
 		var distances:Array<Int>;
 		var tempDistances = tilemap.computePathDistance(startX, endX, true, false);
 		
@@ -113,7 +111,6 @@ class PlayState extends FlxState
 		
 		for (i in 0...distances.length) 
 		{
-			trace(distances[i]);
 			var disti:Int = 0;
 			if (distances[i] < 0) 
 				disti = 1000;
