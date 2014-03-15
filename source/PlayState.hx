@@ -64,6 +64,9 @@ class PlayState extends FlxState
 		_collisionMap.loadMap(map, "assets/images/wall1_tiles.png", TILE_WIDTH, TILE_HEIGHT, FlxTilemap.AUTO);
 		add(_collisionMap);
 
+		FlxG.worldBounds.set(0, 0, _collisionMap.width, _collisionMap.height);
+		//FlxG.worldBounds = _collisionMap.getBounds();
+
 		add(_player);
 
 		FlxG.camera.follow(_player);
