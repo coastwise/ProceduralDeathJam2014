@@ -133,7 +133,7 @@ class PlayState extends FlxState
 		var x = endX % _collisionMap.widthInTiles;
 		var y = (endX - x) / _collisionMap.widthInTiles;
 		_minotaur = new Seeker(x*16,y*16);
-		_minotaur.moveTo(x*16,y*16, SPEED);
+		_minotaur.moveTo(x*16,y*16, 9000); // what? nine-thousand?!
 		add(_minotaur);
 
 		add(_fogMap);
