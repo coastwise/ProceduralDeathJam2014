@@ -29,7 +29,7 @@ class PlayState extends FlxState
 	 * The FlxTilemap we're using
 	 */
 	private var _collisionMap:FlxTilemap;
-
+	private var _fxMap:FlxTilemap;
 
 	private var _player:Player;
 	private var _pos:FlxPoint;
@@ -49,7 +49,6 @@ class PlayState extends FlxState
 	override public function create():Void
 	{
 		FlxG.mouse.visible = false;
-		FlxG.camera.bgColor = FlxColor.WHITE;
 		
 		_dungeonBuilder = new DungeonBuilder();
 		_dungeonBuilder.generate(63,63,64,20,64);
@@ -57,6 +56,7 @@ class PlayState extends FlxState
 		_distMap = new FlxTilemap();
 		_distMap.scale.set(16,16);
 		var arr:Array<Int> = new Array<Int>();
+		var fxArr:Array<Int> = new Array<Int>();
 
 		_fogMap = new FlxTilemap();
 
@@ -65,6 +65,8 @@ class PlayState extends FlxState
 			for (x in 0 ... _dungeonBuilder.mapWidth) {
 				if (_dungeonBuilder.mapArr[y][x] == 2) {	// wall
 					map += "1,";
+					fxArr.push(0);
+
 				} else {
 					map += "0,";
 					if (_player == null && _dungeonBuilder.mapArr[y][x] == 0) {
@@ -75,6 +77,19 @@ class PlayState extends FlxState
 					if (_dungeonBuilder.mapArr[y][x] == 0) {
 						// note the last index inside the dungeon
 						endX = y * (_dungeonBuilder.mapWidth+1) + x;
+
+						// floor
+						fxArr.push(1);
+
+					} else if (_dungeonBuilder.mapArr[y][x] == 1) {
+						// out of dungeon
+						fxArr.push(0);
+
+					} else if (_dungeonBuilder.mapArr[y][x] == 3 ||
+					           _dungeonBuilder.mapArr[y][x] == 4 ||
+					           _dungeonBuilder.mapArr[y][x] == 5) {
+						// door
+						fxArr.push(2);
 					}
 				}
 
@@ -82,6 +97,7 @@ class PlayState extends FlxState
 			}
 			map += "0\n";
 			arr.push(7);
+			fxArr.push(0);
 		}
 
 		// Creates a new tilemap with no arguments
@@ -90,6 +106,12 @@ class PlayState extends FlxState
 		// Initializes the map using the generated string, the tile images, and the tile size
 		_collisionMap.loadMap(map, "assets/images/wall1_tiles.png", TILE_WIDTH, TILE_HEIGHT, FlxTilemap.AUTO);
 		add(_collisionMap);
+
+		_fxMap = new FlxTilemap();
+		_fxMap.widthInTiles = _collisionMap.widthInTiles;
+		_fxMap.heightInTiles = _collisionMap.heightInTiles;
+		_fxMap.loadMap(fxArr, "assets/images/floor_tiles.png", 16, 16);
+		add(_fxMap);
 
 		_distMap.widthInTiles = _collisionMap.widthInTiles;
 		_distMap.heightInTiles = _collisionMap.heightInTiles;
