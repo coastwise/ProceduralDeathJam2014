@@ -7,6 +7,7 @@ import flixel.FlxState;
 import flixel.text.FlxText;
 import flixel.tile.FlxTilemap;
 import flixel.ui.FlxButton;
+import flixel.util.FlxColor;
 import flixel.util.FlxMath;
 import openfl.Assets;
 
@@ -30,6 +31,9 @@ class PlayState extends FlxState
 	private var _player:Player;
 
 	private var _dungeonBuilder:DungeonBuilder;
+
+	private var _distMap:FlxTilemap;
+	private var _fogMap:FlxTilemap;
 	
 	/**
 	 * Function that is called up when to state is created to set it up. 
@@ -37,9 +41,16 @@ class PlayState extends FlxState
 	override public function create():Void
 	{
 		FlxG.mouse.visible = false;
+		FlxG.camera.bgColor = FlxColor.WHITE;
 		
 		_dungeonBuilder = new DungeonBuilder();
 		_dungeonBuilder.generate(63,63,64,20,64);
+
+		_distMap = new FlxTilemap();
+		_distMap.scale.set(16,16);
+		var arr:Array<Int> = new Array<Int>();
+
+		_fogMap = new FlxTilemap();
 
 		var map = "";
 		for (y in 0 ... _dungeonBuilder.mapHeight) {
@@ -53,8 +64,11 @@ class PlayState extends FlxState
 						_player = new Player(x * 16, y * 16);
 					}
 				}
+
+				arr.push(7);
 			}
 			map += "0\n";
+			arr.push(7);
 		}
 
 		// Creates a new tilemap with no arguments
@@ -64,12 +78,59 @@ class PlayState extends FlxState
 		_collisionMap.loadMap(map, "assets/images/wall1_tiles.png", TILE_WIDTH, TILE_HEIGHT, FlxTilemap.AUTO);
 		add(_collisionMap);
 
+		_distMap.widthInTiles = _collisionMap.widthInTiles;
+		_distMap.heightInTiles = _collisionMap.heightInTiles;
+		_distMap.loadMap(arr, "assets/images/heat.png",1,1);
+
+		_fogMap.widthInTiles = _collisionMap.widthInTiles;
+		_fogMap.heightInTiles = _collisionMap.heightInTiles;
+		_fogMap.loadMap(arr, "assets/images/dither.png",16,16);
+		
+		
 		FlxG.worldBounds.set(0, 0, _collisionMap.width, _collisionMap.height);
 		//FlxG.worldBounds = _collisionMap.getBounds();
 
 		add(_player);
 
+		add(_fogMap);
+
 		FlxG.camera.follow(_player);
+
+		updateDistance(_player, _distMap, _collisionMap);
+	}
+
+	private function updateDistance(mcguffin:FlxSprite, distmap:FlxTilemap, tilemap:FlxTilemap):Void 
+	{
+		var startX:Int = Std.int((mcguffin.y/16 * tilemap.widthInTiles) + mcguffin.x/16);
+		var endX:Int = 0;
+		if (startX == endX)
+			endX = 1;
+	
+		var distances:Array<Int>;
+		var tempDistances = tilemap.computePathDistance(startX, endX, true, false);
+		
+		if (tempDistances == null)
+			return;
+		else
+			distances = tempDistances; // safe to assign
+		
+		var maxDistance:Int = 1;
+		for (dist in distances) 
+		{
+			if (dist > maxDistance)
+				maxDistance = dist;
+		}
+		
+		for (i in 0...distances.length) 
+		{
+			var disti:Int = 0;
+			if (distances[i] < 0) 
+				disti = 1000;
+			else
+				disti = Std.int(999 * (distances[i] / maxDistance));
+				
+			distmap.setTileByIndex(i, disti, true);
+		}
 	}
 	
 	/**
@@ -86,6 +147,25 @@ class PlayState extends FlxState
 			// Resetting the movement flag if the player hits the wall 
 			// is crucial, otherwise you can get stuck in the wall
 			_player.moveToNextTile = false;
+		}
+
+		updateFog(Std.int(_player.x/16), Std.int(_player.y/16), 6);
+	}
+
+	public function updateFog(x:Int, y:Int, radius:Int):Void
+	{
+		for (j in y - radius ... y + radius) {
+			if (j < 0 || j > _fogMap.widthInTiles) continue;
+			
+			for (i in x - radius ... x + radius) {
+				if (x < 0 || x > _fogMap.heightInTiles) continue;
+
+				var idx:Int = (j * _fogMap.widthInTiles) + i;
+				var val:Int = Std.int(Math.abs(x-i) + Math.abs(y-j));
+				if (_fogMap.getTileByIndex(idx) > val) {
+					_fogMap.setTileByIndex(idx, val, true);
+				}
+			}
 		}
 	}
 
