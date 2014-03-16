@@ -40,6 +40,7 @@ class PlayState extends FlxState
 	private var _fogMap:FlxTilemap;
 
 	public var distances:Array<Int>;
+	public var endX:Int;
 	
 	/**
 	 * Function that is called up when to state is created to set it up. 
@@ -68,6 +69,11 @@ class PlayState extends FlxState
 					if (_player == null && _dungeonBuilder.mapArr[y][x] == 0) {
 						// spawn the player on a walkable tile (0)
 						_player = new Player(x * 16, y * 16);
+					}
+
+					if (_dungeonBuilder.mapArr[y][x] == 0) {
+						// note the last index inside the dungeon
+						endX = y * (_dungeonBuilder.mapWidth+1) + x;
 					}
 				}
 
@@ -106,15 +112,14 @@ class PlayState extends FlxState
 		FlxG.camera.follow(_player);
 
 		updateFog(Std.int(_pos.x), Std.int(_pos.y), 6);
-		updateDistance(_pos, _distMap, _collisionMap);
+		updateDistance(_pos, endX, _distMap, _collisionMap);
 	}
 
-	private function updateDistance(mcguffin:FlxPoint, distmap:FlxTilemap, tilemap:FlxTilemap):Void 
+	private function updateDistance(mcguffin:FlxPoint, endX:Int, distmap:FlxTilemap, tilemap:FlxTilemap):Void 
 	{
 		var startX:Int = Std.int((mcguffin.y * tilemap.widthInTiles) + mcguffin.x);
-		var endX:Int = 0;
 		if (startX == endX)
-			endX = 1;
+			endX++;
 	
 		var tempDistances = tilemap.computePathDistance(startX, endX, true, false);
 		
@@ -209,7 +214,7 @@ class PlayState extends FlxState
 			_pos.x = Std.int(_player.x / 16);
 			_pos.y = Std.int(_player.y / 16);
 
-			updateDistance(_pos, _distMap, _collisionMap);
+			updateDistance(_pos, endX, _distMap, _collisionMap);
 			updateFog(Std.int(_pos.x), Std.int(_pos.y), 6);
 		}
 
