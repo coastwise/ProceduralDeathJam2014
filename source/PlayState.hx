@@ -158,7 +158,7 @@ class PlayState extends FlxState
 			if (j < 0 || j > _fogMap.widthInTiles) continue;
 			
 			for (i in x - radius ... x + radius) {
-				if (x < 0 || x > _fogMap.heightInTiles) continue;
+				if (i < 0 || i > _fogMap.heightInTiles) continue;
 
 				var idx:Int = (j * _fogMap.widthInTiles) + i;
 				var val:Int = Std.int(Math.abs(x-i) + Math.abs(y-j));
