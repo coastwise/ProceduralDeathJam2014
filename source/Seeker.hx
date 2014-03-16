@@ -14,12 +14,15 @@ class Seeker extends FlxSprite
 	
 	public function new(X:Float, Y:Float)
 	{
-		super(X, Y, "assets/images/seeker.png");
+		super(X, Y);
 		dest = FlxPoint.get();
 		vec = FlxVector.get();
 		setSize(12, 12);
 		offset.set(2, 2);
 		setPosition(2, 2);
+
+		loadGraphic("assets/images/minotaur.png", true, true, 16);
+		animation.add("walk", [0, 1], 8);
 	}
 	
 	public function moveTo(X:Float, Y:Float, Speed:Float):Void 
@@ -53,6 +56,8 @@ class Seeker extends FlxSprite
 		
 		if (!FlxMath.sameSign(oldx, vec.x) || !FlxMath.sameSign(oldy, vec.y))
 			finishMoveTo();
+
+		animation.play("walk");
 	}
 	
 	private function signOf(f:Float):Int 

@@ -34,6 +34,7 @@ class PlayState extends FlxState
 	private var _player:Player;
 	private var _pos:FlxPoint;
 
+	private var _minotaur:Seeker;
 	private var _dungeonBuilder:DungeonBuilder;
 
 	private var _distMap:FlxTilemap;
@@ -106,6 +107,12 @@ class PlayState extends FlxState
 		_pos.x = Std.int(_player.x / 16);
 		_pos.y = Std.int(_player.y / 16);
 		add(_player);
+
+		var x = endX % _collisionMap.widthInTiles;
+		var y = (endX - x) / _collisionMap.widthInTiles;
+		_minotaur = new Seeker(x*16,y*16);
+		_minotaur.moveTo(x*16,y*16, SPEED);
+		add(_minotaur);
 
 		add(_fogMap);
 
@@ -218,7 +225,14 @@ class PlayState extends FlxState
 			updateFog(Std.int(_pos.x), Std.int(_pos.y), 6);
 		}
 
-		
+		updateSeeker(_minotaur, _distMap);
+
+		var dist = FlxMath.getDistance(FlxPoint.get(_player.x, _player.y), FlxPoint.get(_minotaur.x, _minotaur.y));
+		if (dist <= 1.414213562*16) {
+			remove(_player);
+			openSubState(new GameOverSubState());
+		}
+
 	}
 
 	public function updateFog(x:Int, y:Int, radius:Int):Void
