@@ -65,10 +65,10 @@ class PlayState extends FlxState
 					}
 				}
 
-				arr.push(0);
+				arr.push(7);
 			}
 			map += "0\n";
-			arr.push(0);
+			arr.push(7);
 		}
 
 		// Creates a new tilemap with no arguments
@@ -149,7 +149,7 @@ class PlayState extends FlxState
 			_player.moveToNextTile = false;
 		}
 
-		updateFog(Std.int(_player.x/16), Std.int(_player.y/16), 4);
+		updateFog(Std.int(_player.x/16), Std.int(_player.y/16), 6);
 	}
 
 	public function updateFog(x:Int, y:Int, radius:Int):Void
@@ -160,8 +160,11 @@ class PlayState extends FlxState
 			for (i in x - radius ... x + radius) {
 				if (x < 0 || x > _fogMap.heightInTiles) continue;
 
-				_fogMap.setTileByIndex(idx, Std.int(Math.abs(x-i) + Math.abs(y-j)), true);
 				var idx:Int = (j * _fogMap.widthInTiles) + i;
+				var val:Int = Std.int(Math.abs(x-i) + Math.abs(y-j));
+				if (_fogMap.getTileByIndex(idx) > val) {
+					_fogMap.setTileByIndex(idx, val, true);
+				}
 			}
 		}
 	}
