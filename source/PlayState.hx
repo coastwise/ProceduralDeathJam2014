@@ -253,7 +253,7 @@ class PlayState extends FlxState
 		if (dist <= 1.414213562*16) {
 			remove(_player);
 			add(new FlxSprite(_player.x, _player.y, "assets/images/dead.png"));
-			openSubState(new GameOverSubState());
+			openSubState(new GameOverSubState(Std.int(_player.x), Std.int(_player.y)));
 		}
 
 	}
