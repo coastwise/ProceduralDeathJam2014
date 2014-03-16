@@ -17,6 +17,8 @@ import openfl.Assets;
  */
 class PlayState extends FlxState
 {
+	public static inline var SPEED:Int = 64;
+	
 	/**
 	 * Some static constants for the size of the tilemap tiles
 	 */
@@ -36,6 +38,8 @@ class PlayState extends FlxState
 
 	private var _distMap:FlxTilemap;
 	private var _fogMap:FlxTilemap;
+
+	public var distances:Array<Int>;
 	
 	/**
 	 * Function that is called up when to state is created to set it up. 
@@ -112,7 +116,6 @@ class PlayState extends FlxState
 		if (startX == endX)
 			endX = 1;
 	
-		var distances:Array<Int>;
 		var tempDistances = tilemap.computePathDistance(startX, endX, true, false);
 		
 		if (tempDistances == null)
@@ -136,6 +139,53 @@ class PlayState extends FlxState
 				disti = Std.int(999 * (distances[i] / maxDistance));
 				
 			distmap.setTileByIndex(i, disti, true);
+		}
+	}
+
+	public function updateSeeker(seeker:Seeker, distmap:FlxTilemap):Void {
+		if (!seeker.moving)
+		{
+			var tx:Int = Std.int((seeker.x-seeker.offset.x) / 16);
+			var ty:Int = Std.int((seeker.y-seeker.offset.y) / 16);
+			
+			var bestX:Int = 0;
+			var bestY:Int = 0;
+			var bestDist:Float = Math.POSITIVE_INFINITY;
+			var neighbors:Array<Array<Float>> = [[999, 999, 999], [999, 999, 999], [999, 999, 999]];
+			for (yy in -1...2) 
+			{
+				for (xx in -1...2) 
+				{
+					var theX:Int = tx + xx;
+					var theY:Int = ty + yy;
+					
+					if (theX >= 0 && theY < distmap.widthInTiles) 
+					{
+						if (theY >= 0 && theY < distmap.heightInTiles) 
+						{
+							if (xx == 0 || yy == 0)
+							{
+								var distance:Float = distances[theY * distmap.widthInTiles + theX];
+								neighbors[yy + 1][xx + 1] = distance;
+								if (distance > 0)
+								{
+									if (distance < bestDist || (bestX == 0 && bestY == 0))
+									{
+										bestDist = distance;
+										bestX = xx;
+										bestY = yy;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			if (!(bestX == 0 && bestY == 0))
+			{
+				seeker.moveTo((tx * 16) + (bestX * 16) + seeker.offset.x, (ty * 16) + (bestY * 16) + seeker.offset.y, SPEED);
+			}
 		}
 	}
 	
