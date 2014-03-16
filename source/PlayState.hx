@@ -9,6 +9,7 @@ import flixel.tile.FlxTilemap;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 import flixel.util.FlxMath;
+import flixel.util.FlxPoint;
 import openfl.Assets;
 
 /**
@@ -29,6 +30,7 @@ class PlayState extends FlxState
 
 
 	private var _player:Player;
+	private var _pos:FlxPoint;
 
 	private var _dungeonBuilder:DungeonBuilder;
 
@@ -90,18 +92,22 @@ class PlayState extends FlxState
 		FlxG.worldBounds.set(0, 0, _collisionMap.width, _collisionMap.height);
 		//FlxG.worldBounds = _collisionMap.getBounds();
 
+		_pos = FlxPoint.get();
+		_pos.x = Std.int(_player.x / 16);
+		_pos.y = Std.int(_player.y / 16);
 		add(_player);
 
 		add(_fogMap);
 
 		FlxG.camera.follow(_player);
 
-		updateDistance(_player, _distMap, _collisionMap);
+		updateFog(Std.int(_pos.x), Std.int(_pos.y), 6);
+		updateDistance(_pos, _distMap, _collisionMap);
 	}
 
-	private function updateDistance(mcguffin:FlxSprite, distmap:FlxTilemap, tilemap:FlxTilemap):Void 
+	private function updateDistance(mcguffin:FlxPoint, distmap:FlxTilemap, tilemap:FlxTilemap):Void 
 	{
-		var startX:Int = Std.int((mcguffin.y/16 * tilemap.widthInTiles) + mcguffin.x/16);
+		var startX:Int = Std.int((mcguffin.y * tilemap.widthInTiles) + mcguffin.x);
 		var endX:Int = 0;
 		if (startX == endX)
 			endX = 1;
@@ -149,7 +155,15 @@ class PlayState extends FlxState
 			_player.moveToNextTile = false;
 		}
 
-		updateFog(Std.int(_player.x/16), Std.int(_player.y/16), 6);
+		if (Std.int(_player.x/16) != _pos.x || Std.int(_player.y/16) != _pos.y) {
+			_pos.x = Std.int(_player.x / 16);
+			_pos.y = Std.int(_player.y / 16);
+
+			updateDistance(_pos, _distMap, _collisionMap);
+			updateFog(Std.int(_pos.x), Std.int(_pos.y), 6);
+		}
+
+		
 	}
 
 	public function updateFog(x:Int, y:Int, radius:Int):Void
