@@ -230,6 +230,7 @@ class PlayState extends FlxState
 		var dist = FlxMath.getDistance(FlxPoint.get(_player.x, _player.y), FlxPoint.get(_minotaur.x, _minotaur.y));
 		if (dist <= 1.414213562*16) {
 			remove(_player);
+			add(new FlxSprite(_player.x, _player.y, "assets/images/dead.png"));
 			openSubState(new GameOverSubState());
 		}
 
